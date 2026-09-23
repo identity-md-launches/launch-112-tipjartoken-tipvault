@@ -1,0 +1,22 @@
+{
+  "kind": "evm_project",
+  "token": {
+    "contract": "TipJarToken",
+    "name": "Tip Jar",
+    "symbol": "TIPS",
+    "decimals": 18
+  },
+  "contracts": [
+    {
+      "contract": "TipVault",
+      "constructorArgs": ["$token"]
+    }
+  ],
+  "pool": {
+    "pairedCurrency": "0x0000000000000000000000000000000000000000",
+    "fee": 3000,
+    "tickSpacing": 60,
+    "initialPrice": "79228162514264337593543950336"
+  },
+  "notes": "Tip Jar test launch on Sepolia (chainId 11155111) under pinned policy v5. Token: TipJarToken (src/TipJarToken.sol), OpenZeppelin ERC20 named 'Tip Jar', symbol TIPS, 18 decimals, no constructor arguments, nonpayable constructor that mints exactly 1,000,000,000 * 10^18 = 10^27 minor units once to msg.sender (the ProjectFactory). No mint, owner, upgrade, pause, tax, blacklist or rescue entry point; no DELEGATECALL, CALLCODE or SELFDESTRUCT. Application contract 1: TipVault (src/TipVault.sol), constructor(address token_) nonpayable; the single argument is the launch token, supplied by the $token reference. The constructor rejects the zero address and addresses without code, so the token must be deployed first (dependency order: token, then TipVault). TipVault is adminless and immutable: no owner, no $owner argument, no initializer, no post-deploy calls, no constructor ETH, no privileged beneficiary. stake(uint256)/unstake(uint256) move TIPS via SafeERC20; tip() and plain receive() split ETH pro rata among current stakes with a reward-per-share accumulator scaled by 1e18; tips arriving while totalStaked == 0 are queued and distributed by the next positive tip that finds active stake; claim() pays whole-wei accrued ETH with checks-effects-interactions under a shared ReentrancyGuard; views totalStaked, stakedOf, claimable. Both constructors are identical to the ABI exports in docs/abi/TipJarToken.json (no inputs) and docs/abi/TipVault.json (one address input). Pool: native ETH (zero address) pair, fee 3000, tickSpacing 60, no hook, token-only liquidity seeded by the factory. initialPrice 79228162514264337593543950336 is the provenance sqrtPriceX96 (1:1); policy v5 specifies a 20 ETH opening fully diluted valuation and the deployer derives the effective opening price from that policy, overriding this manifest value. Supply, reward split (2% launch contributors, 8% recent accepted-work wallets, 80% LP, 10% treasury, one-hour unlock), allocations and ownership are policy and control-plane outputs, not manifest fields. Build: Foundry, solc 0.8.26, Cancun, optimizer 200 runs, bytecode_hash none, vendored OpenZeppelin v5.1.0 and forge-std v1.9.4 under lib/. This manifest describes the accepted source only and is explanatory; the independent review, attestation and admission steps supply artifact linkage. No mainnet transactions."
+}
